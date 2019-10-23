@@ -13,7 +13,7 @@
 #define SHARP_READ_PIN          A1
 
 #define DHT_PIN                 6
-//#define DHT_TYPE                DHT11
+#define DHT_TYPE                DHT11
 //#define DHT_TYPE                DHT22
 #define DHT_EXPIRES             60000
 
@@ -150,7 +150,7 @@ void handleTimer()
 {
     static uint8_t couter = 0;
 
-    (couter >= 200) ? (couter = 1) : (couter++);
+    (couter >= 20) ? (couter = 1) : (couter++);
 
     if (couter % 2 == 0) {
         _read_temp_humi_flag = true;
@@ -261,7 +261,6 @@ void readUart()
 void transmithData()
 {
     static uint16_t couter = 0;
-    static uint8_t diff_couter = 0;
 
     couter++;
 
@@ -282,21 +281,16 @@ void transmithData()
         _sensors_data[NOISE_INDEX].value != _sensors_data[NOISE_INDEX].last_value
       )
     ) {
-          diff_couter++;
+        _syncData();
+        _sendData();
 
-          if (diff_couter >= 3) {
-              _syncData();
-              _sendData();
-
-              couter = 0;
-              diff_couter = 0;
-          }
+        couter = 0;
 
     } else if (couter % 10 == 0) {
         checkMaster();
 
     } else {
-        diff_couter = 0;
+        //nothing
     }
 }
 
